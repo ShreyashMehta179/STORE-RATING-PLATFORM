@@ -20,7 +20,7 @@ export const register = async (
     const validatedData = registerSchema.parse(req.body);
 
     const existingUser = await prisma.user.findUnique({
-      where: { email: validatedData.email.toLowerCase() },
+      where: { email: validatedData.email.toLowerCase().trim() },
     });
 
     if (existingUser) {
@@ -35,7 +35,7 @@ export const register = async (
     const user = await prisma.user.create({
       data: {
         name: validatedData.name,
-        email: validatedData.email.toLowerCase(),
+        email: validatedData.email.toLowerCase().trim(),
         password: hashedPassword,
         address: validatedData.address,
         role: validatedData.role || 'USER',
@@ -83,9 +83,16 @@ export const login = async (
 ) => {
   try {
     const validatedData = loginSchema.parse(req.body);
+    const normalizedEmail = validatedData.email.toLowerCase().trim();
 
     const user = await prisma.user.findUnique({
-      where: { email: validatedData.email.toLowerCase().trim() },
+      where: { email: normalizedEmail },
+    });
+
+    console.log('[AUTH LOGIN DEBUG]', {
+      email: normalizedEmail,
+      userFound: !!user,
+      isActive: user?.isActive ?? false,
     });
 
     if (!user) {
@@ -106,6 +113,11 @@ export const login = async (
       validatedData.password,
       user.password
     );
+
+    console.log('[AUTH LOGIN DEBUG] Password check:', {
+      email: user.email,
+      passwordValid: isPasswordValid,
+    });
 
     if (!isPasswordValid) {
       return res.status(401).json({
