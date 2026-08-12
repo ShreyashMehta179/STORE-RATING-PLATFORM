@@ -3,13 +3,14 @@ import app from './app';
 import { config } from './config';
 import { prisma } from './utils/prisma';
 import { initSocket } from './utils/socket';
+import { ensureAdminUser } from './utils/ensureAdminUser';
 
 const httpServer = http.createServer(app);
 
 // Initialize Socket.IO
 initSocket(httpServer);
 
-const server = httpServer.listen(config.port, () => {
+const server = httpServer.listen(config.port, async () => {
   console.log(`
 🚀 =================================================== 🚀
    StoreHub Real-Time REST & WebSocket API Server
@@ -18,6 +19,13 @@ const server = httpServer.listen(config.port, () => {
    Database: ${config.databaseUrl.split('@')[1]}
 🚀 =================================================== 🚀
   `);
+
+  // Ensure default admin account exists on startup without deleting data
+  try {
+    await ensureAdminUser();
+  } catch (error) {
+    console.error('Failed to ensure admin user on startup:', error);
+  }
 });
 
 const gracefulShutdown = async () => {
@@ -31,4 +39,3 @@ const gracefulShutdown = async () => {
 
 process.on('SIGINT', gracefulShutdown);
 process.on('SIGTERM', gracefulShutdown);
-
