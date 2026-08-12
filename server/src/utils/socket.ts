@@ -5,9 +5,24 @@ import { config } from '../config';
 let io: SocketIOServer | null = null;
 
 export const initSocket = (httpServer: HttpServer): SocketIOServer => {
+  const allowedOrigins = [
+    config.clientUrl?.replace(/\/+$/, ''),
+    'https://store-rating-platform-black.vercel.app',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:3000',
+  ].filter(Boolean) as string[];
+
   io = new SocketIOServer(httpServer, {
     cors: {
-      origin: [config.clientUrl, 'http://localhost:5173', 'http://127.0.0.1:5173', '*'],
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        const cleanOrigin = origin.replace(/\/+$/, '');
+        if (allowedOrigins.includes(cleanOrigin) || (config.nodeEnv !== 'production' && origin.includes('localhost'))) {
+          return callback(null, true);
+        }
+        callback(null, true);
+      },
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
       credentials: true,
     },
