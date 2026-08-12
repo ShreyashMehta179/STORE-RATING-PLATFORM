@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from './prisma';
 import { Role } from '@prisma/client';
+import { ensureDemoData } from './ensureDemoData';
 
 export async function ensureAdminUser(): Promise<void> {
   try {
@@ -26,6 +27,9 @@ export async function ensureAdminUser(): Promise<void> {
     });
 
     console.log(`✅ Default Admin user ensured: ${admin.email} (Role: ${admin.role}, Active: ${admin.isActive})`);
+
+    // Ensure demo stores & ratings exist safely on startup without deleting data
+    await ensureDemoData();
   } catch (error) {
     console.error('❌ Error in ensureAdminUser:', error);
   }

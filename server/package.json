@@ -12,6 +12,7 @@
     "db:generate": "prisma generate",
     "db:seed": "ts-node prisma/seed.ts",
     "db:ensure-admin": "ts-node prisma/ensure-admin.ts",
+    "db:ensure-demo-data": "ts-node prisma/ensure-demo-data.ts",
     "db:studio": "prisma studio",
     "test": "jest --detectOpenHandles --runInBand"
   },
