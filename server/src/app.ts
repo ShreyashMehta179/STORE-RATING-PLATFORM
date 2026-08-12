@@ -15,6 +15,9 @@ import activityRoutes from './routes/activity.routes';
 
 const app = express();
 
+// Trust reverse proxy (Render, Vercel, Cloudflare) for express-rate-limit and IP resolution
+app.set('trust proxy', 1);
+
 // Security Middlewares
 app.use(helmet());
 
