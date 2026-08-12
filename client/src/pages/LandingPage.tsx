@@ -39,19 +39,20 @@ export const LandingPage: React.FC = () => {
       try {
         const [storesRes, statsRes] = await Promise.all([
           api.get('/stores?limit=6&sortBy=rating&order=desc'),
-          api.get('/analytics/admin?range=all'),
+          api.get('/analytics/public'),
         ]);
 
         if (storesRes.data.success) {
           setFeaturedStores(storesRes.data.data.stores);
         }
 
-        if (statsRes.data.success && statsRes.data.data.stats) {
+        if (statsRes.data.success && statsRes.data.data) {
+          const statsData = statsRes.data.data.stats || statsRes.data.data;
           setStats({
-            totalStores: statsRes.data.data.stats.totalStores || 12,
-            totalRatings: statsRes.data.data.stats.totalRatings || 72,
-            platformAvgRating: statsRes.data.data.stats.platformAvgRating || 4.8,
-            totalUsers: (statsRes.data.data.stats.totalUsers || 10) + 4,
+            totalStores: statsData.totalStores || 12,
+            totalRatings: statsData.totalRatings || 72,
+            platformAvgRating: statsData.platformAvgRating || 4.8,
+            totalUsers: (statsData.totalUsers || 10) + 4,
           });
         }
       } catch (err) {

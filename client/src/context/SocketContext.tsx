@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import { getSanitizedApiUrl } from '../utils/config';
 
 interface SocketContextType {
   socket: Socket | null;
@@ -16,8 +17,8 @@ const SocketContext = createContext<SocketContextType>({
   leaveRoom: () => {},
 });
 
-const SOCKET_URL =
-  import.meta.env.VITE_API_URL?.replace(/\/api\/?$/, '') || 'http://localhost:5000';
+const cleanUrl = getSanitizedApiUrl();
+const SOCKET_URL = cleanUrl || 'http://localhost:5000';
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
