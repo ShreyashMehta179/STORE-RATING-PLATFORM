@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { toast } from 'sonner';
 
-// In production (Render), VITE_API_URL is set to the backend URL, e.g. https://storehub-api.onrender.com
-// In local development, it is empty — Vite's dev server proxy handles /api → localhost:5000
-const API_BASE_URL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL}/api`
-  : '/api';
+// In production (Render Static Site), VITE_API_URL is set to backend URL, e.g. https://store-rating-platform-nh1t.onrender.com
+// In local development, if VITE_API_URL is empty, Vite's dev server proxy handles /api → http://localhost:5000
+const rawApiUrl = (import.meta.env.VITE_API_URL || '').trim();
+const cleanApiUrl = rawApiUrl.replace(/\/+$/, '');
+const API_BASE_URL = cleanApiUrl ? `${cleanApiUrl}/api` : '/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
