@@ -89,12 +89,6 @@ export const login = async (
       where: { email: normalizedEmail },
     });
 
-    console.log('[AUTH LOGIN DEBUG]', {
-      email: normalizedEmail,
-      userFound: !!user,
-      isActive: user?.isActive ?? false,
-    });
-
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -113,11 +107,6 @@ export const login = async (
       validatedData.password,
       user.password
     );
-
-    console.log('[AUTH LOGIN DEBUG] Password check:', {
-      email: user.email,
-      passwordValid: isPasswordValid,
-    });
 
     if (!isPasswordValid) {
       return res.status(401).json({
