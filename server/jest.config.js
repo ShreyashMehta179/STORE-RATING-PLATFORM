@@ -8,9 +8,12 @@ module.exports = {
   clearMocks: true,
   resetMocks: true,
   restoreMocks: true,
-  globals: {
-    'ts-jest': {
-      tsconfig: './tsconfig.test.json',
-    },
+  transform: {
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: './tsconfig.test.json',
+      },
+    ],
   },
 };
