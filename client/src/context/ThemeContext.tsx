@@ -12,10 +12,20 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<ThemeMode>(() => {
-    return (localStorage.getItem('storehub_theme') as ThemeMode) || 'light';
+    const saved = localStorage.getItem('storehub_theme') as ThemeMode;
+    if (saved === 'light' || saved === 'dark' || saved === 'system') {
+      return saved;
+    }
+    return 'light';
   });
 
-  const [isDark, setIsDark] = useState<boolean>(false);
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    const saved = localStorage.getItem('storehub_theme') as ThemeMode;
+    const initialTheme = (saved === 'light' || saved === 'dark' || saved === 'system') ? saved : 'light';
+    if (initialTheme === 'dark') return true;
+    if (initialTheme === 'system') return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return false;
+  });
 
   useEffect(() => {
     const root = document.documentElement;
@@ -39,7 +49,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     applyTheme();
-    localStorage.setItem('storehub_theme', theme);
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = () => {
@@ -52,6 +61,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const setTheme = (newTheme: ThemeMode) => {
     setThemeState(newTheme);
+    localStorage.setItem('storehub_theme', newTheme);
   };
 
   return (

@@ -16,7 +16,7 @@
     (function() {
       try {
         var saved = localStorage.getItem('storehub_theme');
-        var theme = saved || 'light';
+        var theme = (saved === 'dark' || saved === 'light' || saved === 'system') ? saved : 'light';
         var dark = false;
         if (theme === 'dark') {
           dark = true;
