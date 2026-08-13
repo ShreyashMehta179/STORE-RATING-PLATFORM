@@ -7,12 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  USER
-  STORE_OWNER
-}
-
 model User {
   id           String        @id @default(uuid())
   name         String
@@ -24,12 +18,11 @@ model User {
   lastLoginAt  DateTime?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-
-  // Relationships
-  ownedStores  Store[]       @relation("StoreOwner")
-  ratings      Rating[]
-  favorites    Favorite[]
-  activityLogs ActivityLog[]
+  activityLogs       ActivityLog[]
+  favorites          Favorite[]
+  ratings            Rating[]
+  ownedStores        Store[]              @relation("StoreOwner")
+  passwordResetTokens PasswordResetToken[]
 
   @@index([email])
   @@index([role])
@@ -41,8 +34,7 @@ model Store {
   email       String
   address     String
   ownerId     String
-  owner       User       @relation("StoreOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  description String     @db.Text
+  description String
   category    String
   phone       String
   website     String?
@@ -50,10 +42,9 @@ model Store {
   isActive    Boolean    @default(true)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-
-  // Relationships
-  ratings     Rating[]
   favorites   Favorite[]
+  ratings     Rating[]
+  owner       User       @relation("StoreOwner", fields: [ownerId], references: [id], onDelete: Cascade)
 
   @@index([name])
   @@index([address])
@@ -63,13 +54,13 @@ model Store {
 model Rating {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   storeId   String
-  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
   rating    Int
-  review    String?  @db.Text
+  review    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, storeId])
   @@index([rating])
@@ -79,10 +70,10 @@ model Rating {
 model Favorite {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   storeId   String
-  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, storeId])
 }
@@ -90,14 +81,34 @@ model Favorite {
 model ActivityLog {
   id        String   @id @default(uuid())
   userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   action    String
   entity    String
   entityId  String?
   metadata  Json?
   createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([action])
   @@index([createdAt])
+}
+
+enum Role {
+  ADMIN
+  USER
+  STORE_OWNER
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }

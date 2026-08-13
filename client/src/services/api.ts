@@ -40,6 +40,8 @@ api.interceptors.response.use(
       if (
         !window.location.pathname.includes('/login') &&
         !window.location.pathname.includes('/register') &&
+        !window.location.pathname.includes('/forgot-password') &&
+        !window.location.pathname.includes('/reset-password') &&
         window.location.pathname !== '/'
       ) {
         toast.error('Session expired. Please log in again.');
@@ -51,4 +53,15 @@ api.interceptors.response.use(
   }
 );
 
+export const forgotPasswordApi = async (email: string) => {
+  const response = await api.post('/auth/forgot-password', { email });
+  return response.data;
+};
+
+export const resetPasswordApi = async (token: string, password: string) => {
+  const response = await api.post('/auth/reset-password', { token, password });
+  return response.data;
+};
+
 export default api;
+

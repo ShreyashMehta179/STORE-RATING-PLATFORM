@@ -493,13 +493,12 @@ export const LoginPage: React.FC = () => {
                   </span>
                 </label>
 
-                <button
-                  type="button"
-                  onClick={() => setShowForgotModal(true)}
+                <Link
+                  to="/forgot-password"
                   className="font-bold text-brand-500 hover:text-brand-600 dark:hover:text-brand-400 hover:underline transition-colors focus:outline-none"
                 >
                   Forgot password?
-                </button>
+                </Link>
               </div>
 
               {/* Submit Sign In Button */}

@@ -47,3 +47,18 @@ export const updateProfileSchema = z.object({
     .max(400, 'Address must not exceed 400 characters')
     .optional(),
 });
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Invalid email address format'),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, 'Reset token is required'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters long')
+    .max(16, 'Password must not exceed 16 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[^a-zA-Z0-9]/, 'Password must contain at least one special character'),
+});
+
